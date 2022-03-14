@@ -40,8 +40,9 @@ const getPlaces = async () => {
   }
 };
 
-const getPhotos = async (places) => {
-  
+const getPhotos = (id) => {
+    const placeImgId = id
+    return placeImgId
 }
 
 const getForecast = async () => {
@@ -63,9 +64,9 @@ const renderPlaces = (places) => {
   $placeDivs.forEach(($place, index) => {
     // Add your code here:
     const place = places[index]
-    const placeIcon = place.categories[0].icon
-    const placeImgSrc = `${placeIcon.prefix}bg_64${placeIcon.suffix}`
-    const placeContent = createPlaceHTML(place.name, place.location, placeImgSrc);
+    const placeImgId = place.fsq_id
+    const placeImg = getPhotos(placeImgId)
+    const placeContent = createPlaceHTML(place.name, place.location, placeImg, placeImg);
     $place.append(placeContent);
   });
   $destination.append(`<h2>${places[0].location.locality}</h2>`);

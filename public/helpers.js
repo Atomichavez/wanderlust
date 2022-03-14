@@ -1,10 +1,11 @@
-const createPlaceHTML = (name, location, iconSource) => {
+const createPlaceHTML = (name, location, iconSource, placeId) => {
     return `<h2>${name}</h2>
     <img class="placeimage" src="${iconSource}"/>
     <h3>Address:</h3>
     <p>${location.address} ${location.postcode}</p>
     <p>${location.locality}, ${location.region}</p>
-    <p>${location.country}</p>`;
+    <p>${location.country}</p>
+    <p>${placeId}<p>`;
   }
   
   const createWeatherHTML = (currentDay) => {
