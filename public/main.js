@@ -40,9 +40,21 @@ const getPlaces = async () => {
   }
 };
 
-const getPhotos = (id) => {
-    const placeImgId = id
-    return placeImgId
+const getPhotoIds = () => {
+    const placeDivs = document.querySelectorAll(`section#places > div`)
+    const placesIds = Object.values(placeDivs).map(place => place.getAttribute(`id`))
+    
+    return placesIds
+}
+
+const getPhoto = async (photoId) => {
+  try {
+    const photo = await fetch()
+
+    return photo.fcq_id
+  } catch (error) {
+    console.error(`error in getPhoto()`)
+  }
 }
 
 const getForecast = async () => {
@@ -60,31 +72,51 @@ const getForecast = async () => {
 
 
 // Render functions
-const renderPlaces = (places) => {
-  $placeDivs.forEach(($place, index) => {
-    // Add your code here:
-    const place = places[index]
-    const placeImgId = place.fsq_id
-    const placeImg = getPhotos(placeImgId)
-    const placeContent = createPlaceHTML(place.name, place.location, placeImg, placeImg);
-    $place.append(placeContent);
-  });
-  $destination.append(`<h2>${places[0].location.locality}</h2>`);
+const renderPlaces = async (places) => {
+  try {
+    // $placeDivs.forEach(($place, index) => {
+    //   // Add your code here:
+    //   const place = places[index]
+    //   const placeImgId = place.fsq_id
+    //   const placeImg = await getPhotos(placeImgId)
+
+    //   console.log(placeImg)
+
+    //   const placeContent = createPlaceHTML(place.name, place.location, placeImg, placeImg);
+    //   $place.append(placeContent);
+    // });
+    for (let photoId of photoIds) {
+      // Pide las fotos
+      const photo = await getPhoto(/*photoId*/)
+    }
+
+    $destination.append(`<h2>${places[0].location.locality}</h2>`);
+  } catch (error) {
+    console.error(`error in renderPlaces(): ${error}`)
+  }
 };
 
 const renderForecast = (forecast) => {
   const weatherContent = createWeatherHTML(forecast);
   $weatherDiv.append(weatherContent);
-};
+}
 
-const executeSearch = () => {
-  $placeDivs.forEach(place => place.empty());
-  $weatherDiv.empty();
-  $destination.empty();
-  $container.css("visibility", "visible");
-  getPlaces().then(places => renderPlaces(places));
-  getForecast().then(forecast => renderForecast(forecast));
-  return false;
+const executeSearch = async () => {
+  // $placeDivs.forEach(place => place.empty());
+  // $weatherDiv.empty();
+  // $destination.empty();
+  // $container.css("visibility", "visible")
+  // ==> document.querySelector(`[data-id="input-for-something"]`).style.visibility = `visible`
+  // getPlaces().then(places => renderPlaces(places));
+  // getForecast().then(forecast => renderForecast(forecast));
+  // return false;
+  try {
+    const places = await getPlaces()
+    const forecast = await getForecast()
+    const photos = getPhotos(places)
+  } catch (error) {
+    console.error()
+  }
 }
 
 $submit.click(executeSearch);
