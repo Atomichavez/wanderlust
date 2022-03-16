@@ -33,6 +33,7 @@ const getPlaces = async () => {
      if(response.ok) {
        const jsonResponse = await response.json()
        const places = jsonResponse.results
+       console.log(places)
        return places
      } throw new Error('Sorry')
   } catch(err) {
@@ -41,15 +42,15 @@ const getPlaces = async () => {
 };
 
 const getPhotos = async (places) => {
-  await Promise.all(places.map(async(place)=> {
+  await Promise.all(places.map(async(place, i)=> {
     const placeId = await place.fsq_id
     const urlToFetch = `${url}${placeId}/photos`
     const response = await fetch(urlToFetch, options)
-    console.log(urlToFetch)
+    console.log(urlToFetch + " " + i)
     try {
       if(response.ok){
         const jsonResponse = await response.json()
-        //console.log(jsonResponse)
+        console.log(jsonResponse)
       } throw new Error('Throw Error getting photos')
     } catch (err) {
     console.log('Catch Error getting photos')
