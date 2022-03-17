@@ -41,12 +41,12 @@ const getPhotos = async (places) => {
     const placeId = place.fsq_id
     const urlToFetch = `${url}${placeId}/photos?limit=1`
     await fetch(urlToFetch, options)
-      .then(response => response.json())
+      .then(response => response.json()).catch((err)=> console.log(err))
       .then(jsonResponse => {
         place["photo"] = jsonResponse
         places[i] = place
         console.log(jsonResponse[0].prefix, jsonResponse[0].suffix)
-      })
+      }).catch((err)=> console.log(err))
   }))
   console.log(places)
   return places
@@ -68,13 +68,15 @@ const getForecast = async () => {
 const renderPlaces = (places) => {
   $placeDivs.forEach(($place, index) => {
     const place = places[index]
-    
-    // const placeIcon = place.categories[0].icon
-    // const placeImgSrc = `${placeIcon.prefix}bg_64${placeIcon.suffix}`
 
-    const placePhoto = place.photo[0]                                               //@Adrian ese p2 de que arriba imprime promesas segun yo me esta desmadrando esto
-    const placeImgSrc = `${placePhoto.prefix}200x200${placePhoto.suffix}`
-
+    //Por si no hay fotos que ponga el icon
+    if(place.photo[0]) {
+      const placePhoto = place.photo[0]
+      var placeImgSrc = `${placePhoto.prefix}200x200${placePhoto.suffix}`
+    } else {
+      const placeIcon = place.categories[0].icon
+      var placeImgSrc = `${placeIcon.prefix}bg_64${placeIcon.suffix}`
+    }
     const placeContent = createPlaceHTML(place.name, place.location, placeImgSrc);
     $place.append(placeContent);
   });
