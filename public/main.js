@@ -40,12 +40,13 @@ const getPhotos = async (places) => {
   await Promise.all(places.map(async(place, i)=> {
     const placeId = place.fsq_id
     const urlToFetch = `${url}${placeId}/photos?limit=1`
-    await fetch(urlToFetch, options).then((response)=>{
-      const jsonResponse = response.json()
-      place["photo"] = jsonResponse
-      places[i] = place
-      console.log(jsonResponse)                 //@Adrian porque este pedo imprime promesas?, no se supone que ya estan resueltas?
-    })
+    await fetch(urlToFetch, options)
+      .then(response => response.json())
+      .then(jsonResponse => {
+        place["photo"] = jsonResponse
+        places[i] = place
+        console.log(jsonResponse[0].prefix, jsonResponse[0].suffix)
+      })
   }))
   console.log(places)
   return places
@@ -72,7 +73,7 @@ const renderPlaces = (places) => {
     // const placeImgSrc = `${placeIcon.prefix}bg_64${placeIcon.suffix}`
 
     const placePhoto = place.photo[0]                                               //@Adrian ese p2 de que arriba imprime promesas segun yo me esta desmadrando esto
-    const placeImgSrc = `${placePhoto.prefix}original${placePhoto.suffix}`
+    const placeImgSrc = `${placePhoto.prefix}200x200${placePhoto.suffix}`
 
     const placeContent = createPlaceHTML(place.name, place.location, placeImgSrc);
     $place.append(placeContent);
