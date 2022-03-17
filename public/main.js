@@ -1,15 +1,11 @@
-// Foursquare API Info
 const foursquareKey = 'fsq39kqaQhU/X5MGGFQTTrDKVGe7TK2napXTMdB+v0+GyUw=';
 const url = 'https://api.foursquare.com/v3/places/';
 
-// OpenWeather Info
 const openWeatherKey = '457307149d2967bed8280b5b1cbd49a5';
 const weatherUrl = 'https://api.openweathermap.org/data/2.5/weather';
 
-// Page Elements
 const input = document.getElementById('city');
 const submit = document.getElementById('button')
-//const $submit = $('#button');
 const $destination = $('#destination');
 const $container = $('.container');
 const $placeDivs = [$("#place1"), $("#place2"), $("#place3"), $("#place4"), $("#place5")];
@@ -24,7 +20,6 @@ const options = {
   }
 };
 
-// Add AJAX functions here:
 const getPlaces = async () => {
   const city = input.value
   const urlToFetch = `${url}search?near=${city}`
@@ -43,19 +38,16 @@ const getPlaces = async () => {
 
 const getPhotos = async (places) => {
   await Promise.all(places.map(async(place, i)=> {
-    const placeId = await place.fsq_id
-    const urlToFetch = `${url}${placeId}/photos`
-    const response = await fetch(urlToFetch, options)
-    console.log(urlToFetch + " " + i)
-    try {
-      if(response.ok){
-        const jsonResponse = await response.json()
-        console.log(jsonResponse)
-      } throw new Error('Throw Error getting photos')
-    } catch (err) {
-    console.log('Catch Error getting photos')
-    }
+    const placeId = place.fsq_id
+    const urlToFetch = `${url}${placeId}/photos?limit=1`
+    await fetch(urlToFetch, options).then((response)=>{
+      const jsonResponse = response.json()
+      place["photo"] = jsonResponse
+      places[i] = place
+      console.log(jsonResponse)                 //@Adrian porque este pedo imprime promesas?, no se supone que ya estan resueltas?
+    })
   }))
+  console.log(places)
   return places
 }
 
@@ -72,14 +64,16 @@ const getForecast = async () => {
   catch(err){console.log(err)}
 };
 
-
-// Render functions
 const renderPlaces = (places) => {
   $placeDivs.forEach(($place, index) => {
-    // Add your code here:
     const place = places[index]
-    const placeIcon = place.categories[0].icon
-    const placeImgSrc = `${placeIcon.prefix}bg_64${placeIcon.suffix}`
+    
+    // const placeIcon = place.categories[0].icon
+    // const placeImgSrc = `${placeIcon.prefix}bg_64${placeIcon.suffix}`
+
+    const placePhoto = place.photo[0]                                               //@Adrian ese p2 de que arriba imprime promesas segun yo me esta desmadrando esto
+    const placeImgSrc = `${placePhoto.prefix}original${placePhoto.suffix}`
+
     const placeContent = createPlaceHTML(place.name, place.location, placeImgSrc);
     $place.append(placeContent);
   });
