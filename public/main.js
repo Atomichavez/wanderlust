@@ -36,20 +36,21 @@ const getPlaces = async () => {
   }
 };
 
-const getPhotos = async (places) => {
-  await Promise.all(places.map(async(place, i)=> {
-    const placeId = place.fsq_id
-    const urlToFetch = `${url}${placeId}/photos?limit=1`
-    await fetch(urlToFetch, options)
-      .then(response => response.json()).catch((err)=> console.log(err))
-      .then(jsonResponse => {
-        place["photo"] = jsonResponse
-        places[i] = place
-        console.log(jsonResponse[0].prefix, jsonResponse[0].suffix)
-      }).catch((err)=> console.log(err))
-  }))
-  console.log(places)
-  return places
+const getPhotoIds = () => {
+    const placeDivs = document.querySelectorAll(`section#places > div`)
+    const placesIds = Object.values(placeDivs).map(place => place.getAttribute(`id`))
+    
+    return placesIds
+}
+
+const getPhoto = async (photoId) => {
+  try {
+    const photo = await fetch()
+
+    return photo.fcq_id
+  } catch (error) {
+    console.error(`error in getPhoto()`)
+  }
 }
 
 const getForecast = async () => {
@@ -65,38 +66,53 @@ const getForecast = async () => {
   catch(err){console.log(err)}
 };
 
-const renderPlaces = (places) => {
-  $placeDivs.forEach(($place, index) => {
-    const place = places[index]
 
-    //Por si no hay fotos que ponga el icon
-    if(place.photo[0]) {
-      const placePhoto = place.photo[0]
-      var placeImgSrc = `${placePhoto.prefix}200x200${placePhoto.suffix}`
-    } else {
-      const placeIcon = place.categories[0].icon
-      var placeImgSrc = `${placeIcon.prefix}bg_64${placeIcon.suffix}`
+// Render functions
+const renderPlaces = async (places) => {
+  try {
+    // $placeDivs.forEach(($place, index) => {
+    //   // Add your code here:
+    //   const place = places[index]
+    //   const placeImgId = place.fsq_id
+    //   const placeImg = await getPhotos(placeImgId)
+
+    //   console.log(placeImg)
+
+    //   const placeContent = createPlaceHTML(place.name, place.location, placeImg, placeImg);
+    //   $place.append(placeContent);
+    // });
+    for (let photoId of photoIds) {
+      // Pide las fotos
+      const photo = await getPhoto(/*photoId*/)
     }
-    const placeContent = createPlaceHTML(place.name, place.location, placeImgSrc);
-    $place.append(placeContent);
-  });
-  $destination.append(`<h2>${places[0].location.locality}</h2>`);
+
+    $destination.append(`<h2>${places[0].location.locality}</h2>`);
+  } catch (error) {
+    console.error(`error in renderPlaces(): ${error}`)
+  }
 };
 
 const renderForecast = (forecast) => {
   const weatherContent = createWeatherHTML(forecast);
   $weatherDiv.append(weatherContent);
-};
-
-const executeSearch = () => {
-  $placeDivs.forEach(place => place.empty());
-  $weatherDiv.empty();
-  $destination.empty();
-  $container.css("visibility", "visible");
-  getPlaces().then(places => getPhotos(places)).then(places => renderPlaces(places));
-  getForecast().then(forecast => renderForecast(forecast));
-  return false;
 }
 
-submit.onclick = executeSearch;
+const executeSearch = async () => {
+  // $placeDivs.forEach(place => place.empty());
+  // $weatherDiv.empty();
+  // $destination.empty();
+  // $container.css("visibility", "visible")
+  // ==> document.querySelector(`[data-id="input-for-something"]`).style.visibility = `visible`
+  // getPlaces().then(places => renderPlaces(places));
+  // getForecast().then(forecast => renderForecast(forecast));
+  // return false;
+  try {
+    const places = await getPlaces()
+    const forecast = await getForecast()
+    const photos = getPhotos(places)
+  } catch (error) {
+    console.error()
+  }
+}
 
+$submit.click(executeSearch);
